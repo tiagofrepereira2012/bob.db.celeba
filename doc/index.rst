@@ -1,14 +1,16 @@
 .. vim: set fileencoding=utf-8 :
-.. @author: Manuel Guenther <Manuel.Guenther@idiap.ch>
+.. @author: Manuel Gunther <siebenkopf@googlemail.com>
 .. @date:   Tue Aug 26 09:42:18 CEST 2014
 
-.. _bob.db.mnist:
+.. _bob.db.celeba:
 
-==========================
- MNIST Database Interface
-==========================
+===========================
+ CelebA Database Interface
+===========================
 
-.. todolist::
+This package contains an implementation of the protocol for the CelebA facial attribute database.
+It does not contain the raw data, which can be downloaded from the original URL: http://personal.ie.cuhk.edu.hk/~lz013/projects/CelebA.html
+
 
 Documentation
 -------------
@@ -19,10 +21,10 @@ Documentation
    guide
    py_api
 
+
 Indices and tables
 ------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

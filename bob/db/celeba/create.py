@@ -35,6 +35,8 @@ def _update(session, field):
   return field
 
 
+debug = False
+
 def _file_id(name):
   return int(os.path.splitext(name)[0])
 
@@ -56,7 +58,7 @@ def add_annotations(session, directory):
       annotation = Annotation(_file_id(splits[0]), [int(s) for s in splits[1:]])
       session.add(annotation)
 
-#      if counter == 1000: break
+      if debug and counter == 1000: break
 
     logger.info("Created %d Annotation objects", counter)
 
@@ -79,7 +81,7 @@ def add_attributes(session, directory):
       session.add(attributes)
       logger.debug("Added attribute %s", attributes)
 
-#      if counter == 1000: break
+      if debug and counter == 1000: break
 
     logger.info("Created %d Attribute objects", counter)
 
@@ -109,7 +111,7 @@ def add_files_and_purposes(session, directory):
       session.add(file)
       logger.debug("Added file %s", file)
 
-#      if counter == 1000: break
+      if debug and counter == 1000: break
 
     logger.info("Created %d File objects", counter)
 

@@ -247,7 +247,7 @@ autodoc_default_flags = ['members', 'undoc-members', 'inherited-members', 'show-
 
 # For inter-documentation mapping:
 from bob.extension.utils import link_documentation
-intersphinx_mapping = link_documentation()
+intersphinx_mapping = link_documentation(['bob.ip.base'])
 
 
 def setup(app):

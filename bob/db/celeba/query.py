@@ -27,7 +27,7 @@ class Database():
   """Wrapper class for the MNIST database of handwritten digits (http://yann.lecun.com/exdb/mnist/).
   """
 
-  def __init__(self, original_directory = None, original_extension = None):
+  def __init__(self, original_directory = None, original_extension = '.jpg'):
     """Creates the database"""
     # initialize members
     self.m_sqlite_file = Interface().files()[0]
@@ -36,7 +36,8 @@ class Database():
     else:
       import bob.db.base.utils
       self.m_session = bob.db.base.utils.session_try_readonly('sqlite', self.m_sqlite_file)
-
+    self.original_directory = original_directory
+    self.original_extension = original_extension
 
   def __del__(self):
     """Closes the connection to the database when it is not needed any more."""
@@ -115,7 +116,7 @@ class Database():
   def attribute_names(self):
     """Returns the vector of labels
     """
-    return Attribute.attribute_names
+    return Attributes.attribute_names
 
 
   def objects(self, purposes = None):
@@ -141,6 +142,25 @@ class Database():
     if purposes is not None:
       q = q.join(Purpose).filter(Purpose.name.in_(purposes_))
     return list(q)
+
+
+  def original_file_name(self, file):
+    """original_file_name(self, file) -> image_name
+
+    Returns the full path of the original image name.
+    This function requires that the ``original_directory`` was specified in the constructor of this class.
+
+    **Parameters:**
+
+    ``file`` : : :py:class:`File`
+      The file object to get the original file name for.
+
+    **Returns:**
+
+    image_name : str
+      The full path to the image belonging to the given :py:class:`File` object.
+    """
+    return file.make_path(self.original_directory, self.original_extension)
 
 
   def annotations(self, file):

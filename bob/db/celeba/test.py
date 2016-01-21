@@ -21,6 +21,7 @@
 
 import bob.db.celeba
 import random
+import os
 
 def test_query():
   db = bob.db.celeba.Database()
@@ -50,13 +51,30 @@ def test_annotations():
 def test_attributes():
   db = bob.db.celeba.Database()
 
-  o = random.sample(db.objects(), 100)
+  o = random.sample(db.objects(), 1000)
   for f in o:
     a = db.attributes(f)
-    assert len(a) == len(bob.db.celeba.models.Attributes.attribute_names)
+    assert len(a) == len(db.attribute_names())
     assert all(v == 1 or v == -1 for v in a)
 
     n = random.sample(bob.db.celeba.models.Attributes.attribute_names, 5)
     a2 = db.attributes(f, n)
     assert len(a2) == 5
     assert all(v == 1 or v == -1 for v in a2)
+
+
+def test_attribute_values():
+  db = bob.db.celeba.Database()
+  f = db.objects()[0]
+  assert f.id == 1
+  first_attributes = [-1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1]
+  assert f.attributes() == first_attributes, f.attributes()
+
+
+def test_file_names():
+  db = bob.db.celeba.Database("/path/to/files")
+
+  o = random.sample(db.objects(), 10000)
+  for f in o:
+    n = db.original_file_name(f)
+    assert n == os.path.join("/path/to/files", "%06d.jpg" % f.id)

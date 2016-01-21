@@ -144,14 +144,14 @@ class Attributes(Base):
 
   for n in attribute_names:
     # define names as boolean
-    exec "_%s = Boolean()" % n
+    exec "_%s = Column(Boolean)" % n
 
   def __init__(self, file_id, attributes):
     self.file_id = file_id
 
     assert len(attributes) == 40
     for i in range(40):
-      exec "self._%s = attributes[i] == 1" % self.attribute_names[i]
+      exec "self._%s = (attributes[i] == 1)" % self.attribute_names[i]
 
   def __call__(self, attribute_names = None):
     """Returns these attributes in a dictionary, with the attribute name as key and the binary value ``+1`` or ``-1`` for the presence or absence of the attribute.
@@ -224,4 +224,4 @@ class File(Base):
     if not directory: directory = ''
     if not extension: extension = ''
     # create the path
-    return str(os.path.join(directory, "%d%s" % (self.path, extension)))
+    return str(os.path.join(directory, "%06d%s" % (self.id, extension)))
