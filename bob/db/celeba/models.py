@@ -155,7 +155,9 @@ class Attributes(Base):
     """
     if attribute_names is None:
       attribute_names = self.attribute_names
-    return [eval("1 if self._%s else -1" % a) for a in attribute_names]
+    # we have to get the locals() here, as they do not contain 'self' when queried in the list comprehension below
+    local = locals()
+    return [eval ("1 if self._%s else -1" % a, globals(), local) for a in attribute_names]
 
 
   def __repr__(self):
