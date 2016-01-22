@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Laurent El Shafey <laurent.el-shafey@idiap.ch>
-#
-# Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+# @author: Manuel Gunther <siebenkopf@googlemail.com>
+# @date:   Fri Jan 22 09:08:25 MST 2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-# Wed May 8 19:05:23 CEST 2013
-#
-# Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
+# @author: Manuel Gunther <siebenkopf@googlemail.com>
+# @date:   Fri Jan 22 09:08:25 MST 2016
 
 import os
 import sys
-import glob
 import pkg_resources
 
 
@@ -61,7 +58,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Celeb-A Database (Bob API)'
 import time
-copyright = u'%s, Idiap Research Institute' % time.strftime('%Y')
+#copyright = u'%s, Idiap Research Institute' % time.strftime('%Y')
 
 # Grab the setup entry
 distribution = pkg_resources.require('bob.db.celeba')[0]
@@ -203,7 +200,7 @@ latex_font_size = '10pt'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'bob_db_celeba.tex', u'Bob',
-   u'Biometrics Group, Idiap Research Institute', 'manual'),
+   u'VaST Lab, UCCS', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -237,7 +234,7 @@ rst_epilog = ''
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'bob', u'Celeb-A Database (Bob API) Documentation', [u'Idiap Research Institute'], 1)
+    ('index', 'bob', u'Celeb-A Database (Bob API) Documentation', [u'VaST Lab'], 1)
 ]
 
 # Default processing flags for sphinx

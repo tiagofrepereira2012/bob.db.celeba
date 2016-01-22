@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# @author: Manuel Gunther <mgunther@vast.uccs.edu>
-# @date:   Fri Sep 11 14:53:52 MDT 2015
+# @author: Manuel Gunther <siebenkopf@googlemail.com>
+# @date:   Fri Jan 22 09:08:25 MST 2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,10 +25,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
-import bob.db.verification.utils
-
 Base = declarative_base()
-
 
 """ Defining protocols. Yes, they are static """
 GROUPS    = ('world', 'dev')
@@ -144,14 +141,14 @@ class Attributes(Base):
 
   for n in attribute_names:
     # define names as boolean
-    exec "_%s = Column(Boolean)" % n
+    exec ("_%s = Column(Boolean)" % n, globals(), locals())
 
   def __init__(self, file_id, attributes):
     self.file_id = file_id
 
     assert len(attributes) == 40
     for i in range(40):
-      exec "self._%s = (attributes[i] == 1)" % self.attribute_names[i]
+      exec ("self._%s = (attributes[i] == 1)" % self.attribute_names[i], globals(), locals())
 
   def __call__(self, attribute_names = None):
     """Returns these attributes in a dictionary, with the attribute name as key and the binary value ``+1`` or ``-1`` for the presence or absence of the attribute.

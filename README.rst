@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
-.. Manuel Guenther <manuel.guenther@idiap.ch>
-.. Fri Oct 31 14:18:57 CET 2014
+.. Manuel Gunther <siebenkopf@googlemail.com>
+.. Fri Jan 22 09:08:25 MST 2016
 
 .. image:: http://img.shields.io/badge/docs-stable-yellow.png
    :target: http://pythonhosted.org/bob.db.celeba/index.html

@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
 .. @author: Manuel Gunther <siebenkopf@googlemail.com>
-.. @date:   Tue Aug 26 09:42:18 CEST 2014
+.. @date:   Fri Jan 22 09:08:25 MST 2016
 
 .. _bob.db.celeba:
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# @author: Manuel Gunther <mgunther@vast.uccs.edu>
-# @date:   Fri Sep 11 14:53:52 MDT 2015
+# @author: Manuel Gunther <siebenkopf@googlemail.com>
+# @date:   Fri Jan 22 09:08:25 MST 2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

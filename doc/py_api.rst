@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
-.. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-.. Wed May 8 19:07:55 CEST 2013
+.. @author: Manuel Gunther <siebenkopf@googlemail.com>
+.. @date:   Fri Jan 22 09:08:25 MST 2016
 
 ============
  Python API

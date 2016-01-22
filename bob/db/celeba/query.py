@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# @author: Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-# @date: Wed May 8 19:42:39 CEST 2013
-#
-# Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+# @author: Manuel Gunther <siebenkopf@googlemail.com>
+# @date:   Fri Jan 22 09:08:25 MST 2016
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import shutil
 import os
 
 from .models import *
