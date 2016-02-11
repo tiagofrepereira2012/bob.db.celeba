@@ -125,12 +125,11 @@ class Interface(BaseInterface):
     return pkg_resources.require('bob.db.%s' % self.name())[0].version
 
   def files(self):
-    from pkg_resources import resource_filename
-    raw_files = ('db.sql3',)
-    return [resource_filename(__name__, k) for k in raw_files]
+    from .models import protocol_file
+    return [protocol_file]
 
   def type(self):
-    return 'sqlite'
+    return 'text'
 
   def add_commands(self, parser):
 

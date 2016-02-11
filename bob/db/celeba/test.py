@@ -41,7 +41,7 @@ def test_query():
 def test_annotations():
   db = bob.db.celeba.Database()
 
-  o = random.sample(db.objects(), 100)
+  o = random.sample(db.objects(), 10000)
   for f in o:
     a = db.annotations(f)
     assert set(a.keys()) == set(['leye', 'reye', 'nose', 'lmouth', 'rmouth'])
@@ -50,7 +50,7 @@ def test_annotations():
 def test_attributes():
   db = bob.db.celeba.Database()
 
-  o = random.sample(db.objects(), 1000)
+  o = random.sample(db.objects(), 10000)
   for f in o:
     a = db.attributes(f)
     assert len(a) == len(db.attribute_names())
@@ -67,7 +67,7 @@ def test_attribute_values():
   f = db.objects()[0]
   assert f.id == 1
   first_attributes = [-1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1]
-  assert f.attributes() == first_attributes, f.attributes()
+  assert db.attributes(f) == first_attributes
 
 
 def test_file_names():

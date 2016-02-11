@@ -27,47 +27,8 @@ class Database():
   def __init__(self, original_directory = None, original_extension = '.jpg'):
     """Creates the database"""
     # initialize members
-    self.m_sqlite_file = Interface().files()[0]
-    if not os.path.exists(self.m_sqlite_file):
-      self.m_session = None
-    else:
-      import bob.db.base.utils
-      self.m_session = bob.db.base.utils.session_try_readonly('sqlite', self.m_sqlite_file)
     self.original_directory = original_directory
     self.original_extension = original_extension
-
-  def __del__(self):
-    """Closes the connection to the database when it is not needed any more."""
-    if self.is_valid():
-      # do some magic to close the connection to the database file
-      try:
-        # Since the dispose function re-creates a pool
-        #   which might fail in some conditions, e.g., when this destructor is called during the exit of the python interpreter
-        self.m_session.close()
-        self.m_session.bind.dispose()
-      except TypeError:
-        # ... I can just ignore the according exception...
-        pass
-      except AttributeError:
-        pass
-
-
-  def is_valid(self):
-    """Returns if a valid session has been opened for reading the database."""
-    return self.m_session is not None
-
-
-  def assert_validity(self):
-    """Raise a RuntimeError if the database back-end is not available."""
-    if not self.is_valid():
-      raise IOError("Database of type 'sqlite' cannot be found at expected location '%s'." % self.m_sqlite_file)
-
-
-  def query(self, *args):
-    """Creates a query to the database using the given arguments."""
-    self.assert_validity()
-    return self.m_session.query(*args)
-
 
   def _check_parameters_for_validity(self, parameters, parameter_description, valid_parameters, default_parameters = None):
     """Checks the given parameters for validity, i.e., if they are contained in the set of valid parameters.
@@ -133,12 +94,9 @@ class Database():
     ``files`` : [:py:class:`File`]
       A list of files for the given purpose(s).
     """
-    purposes_ = self._check_parameters_for_validity(purposes, "purpose", Purpose.purpose_names)
+    purposes = self._check_parameters_for_validity(purposes, "purpose", purpose_names)
 
-    q = self.query(File).order_by(File.id)
-    if purposes is not None:
-      q = q.join(Purpose).filter(Purpose.name.in_(purposes_))
-    return list(q)
+    return [f for f in get_files() if f.purpose_name in purposes]
 
 
   def original_file_name(self, file):
@@ -180,7 +138,8 @@ class Database():
     ``annotations`` : {}
       The dictionary of annotations, which include the coordinated for 'reye', 'leye', 'nose', 'rmouth', 'lmouth'.
     """
-    return file.annotation()
+    annotations = get_annotations()[file.id]
+    return annotations()
 
 
   def attributes(self, file, attribute_names=None):
@@ -203,6 +162,8 @@ class Database():
     ``attributes`` : [int]
       The list of attributes, which are either +1 (in case the attribute is present) or -1 (in case the attribute is absent).
     """
-    attribute_names = self._check_parameters_for_validity(attribute_names, "attribute name", Attributes.attribute_names)
+    if attribute_names is not None:
+      attribute_names = self._check_parameters_for_validity(attribute_names, "attribute name", Attributes.attribute_names)
 
-    return file.attributes(attribute_names)
+    attribute = get_attributes()[file.id]
+    return attribute(attribute_names)

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .query import Database
-from .models import File, Annotation, Attributes, Purpose
+from .models import File, Annotation, Attributes
 
 def get_config():
   """Returns a string containing the configuration information.

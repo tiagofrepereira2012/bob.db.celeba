@@ -17,21 +17,12 @@
 
 """Table models and functionality for the CelebA database.
 """
-
-import sqlalchemy
-from sqlalchemy import Table, Column, Integer, Float, String, Boolean, ForeignKey, or_, and_, not_
-from bob.db.base.sqlalchemy_migration import Enum, relationship
-from sqlalchemy.orm import backref
-from sqlalchemy.ext.declarative import declarative_base
 import os
 
-Base = declarative_base()
+import pkg_resources
+import tarfile
 
-""" Defining protocols. Yes, they are static """
-GROUPS    = ('world', 'dev')
-
-
-class Annotation(Base):
+class Annotation:
   """Annotations of the CelebA database consists of the locations of the two eyes, the nose tip and the mouth corners.
   There is exactly one annotation for each :py:class:`File`, which after creation of the database can be obtained using ``self.file``.
 
@@ -40,22 +31,6 @@ class Annotation(Base):
      To be consistent with other databases of Bob, here we change them to be in subject perspective (i.e., the right eye is to the left of the left eye).
      Also, as usual for Bob, coordinates are specified in ``(y,x)`` order, opposite to how they are written in the list file.
   """
-  __tablename__ = 'annotation'
-
-  id = Column(Integer, primary_key=True)
-  file_id = Column(Integer, ForeignKey('file.id'))
-
-  le_x = Column(Float) # left eye
-  le_y = Column(Float)
-  re_x = Column(Float) # right eye
-  re_y = Column(Float)
-  n_x = Column(Float) # nose
-  n_y = Column(Float)
-  lm_x = Column(Float) # left mouth
-  lm_y = Column(Float)
-  rm_x = Column(Float) # right mouth
-  rm_y = Column(Float)
-
   def __init__(self, file_id, labels):
     self.file_id = file_id
 
@@ -86,12 +61,11 @@ class Annotation(Base):
     return "<Annotation('%d')>" % self.file_id
 
 
-class Attributes(Base):
+class Attributes:
   """Attributes of the CelebA database consist of a list of binary labels for the face, such as ``Smiling``, ``Wavy_Hair``, ``Young`` or ``Pointy_Nose``.
   Each attribute is binary, i.e., it either exists (``+1``) or it does not exist (``-1``).
   There is exactly one set of attributes for each :py:class:`File`, which after creation of the database can be obtained using ``self.file``.
   """
-  __tablename__ = 'attributes'
 
   attribute_names = (
     '5_o_Clock_Shadow',
@@ -136,47 +110,26 @@ class Attributes(Base):
     'Young'
   )
 
-  id = Column(Integer, primary_key=True)
-  file_id = Column(Integer, ForeignKey('file.id'))
-
-  for n in attribute_names:
-    # define names as boolean
-    exec ("_%s = Column(Boolean)" % n, globals(), locals())
+  attribute_indices = {a:i for i,a in enumerate(attribute_names)}
 
   def __init__(self, file_id, attributes):
     self.file_id = file_id
 
     assert len(attributes) == 40
-    for i in range(40):
-      exec ("self._%s = (attributes[i] == 1)" % self.attribute_names[i], globals(), locals())
+    self.attributes = attributes
 
   def __call__(self, attribute_names = None):
     """Returns these attributes in a dictionary, with the attribute name as key and the binary value ``+1`` or ``-1`` for the presence or absence of the attribute.
     """
     if attribute_names is None:
-      attribute_names = self.attribute_names
-    # we have to get the locals() here, as they do not contain 'self' when queried in the list comprehension below
-    local = locals()
-    return [eval ("1 if self._%s else -1" % a, globals(), local) for a in attribute_names]
-
+      return self.attributes
+    return [self.attributes[self.attribute_indices[a]] for a in attribute_names]
 
   def __repr__(self):
     return "<Attributes('%d')>" % self.file_id
 
 
-class Purpose(Base):
-  """The purpose class defines, which file belongs to which group (training, validation, test)"""
-  __tablename__ = "purpose"
-
-  purpose_names = ("training", "validation", "test")
-
-  name = Column(Enum(*purpose_names), primary_key=True)
-
-  def __init__(self, purpose):
-    self.name = purpose
-
-
-class File(Base):
+class File:
   """Information about the files of the CelebA database.
 
   Each file includes only a numerical ID (which is identical to the file path).
@@ -188,17 +141,6 @@ class File(Base):
   * ``purpose``: the :py:class:`Purpose`, for which this file is used
 
   """
-  __tablename__ = 'file'
-
-  id = Column(Integer, primary_key=True)
-  purpose_name = Column(Enum(*Purpose.purpose_names), ForeignKey("purpose.name"))
-
-  # one-to-one relationship between annotations and files
-  annotation = relationship("Annotation", backref=backref("file", order_by=id, uselist=False), uselist=False)
-  attributes = relationship("Attributes", backref=backref("file", order_by=id, uselist=False), uselist=False)
-
-  purpose = relationship("Purpose", backref=backref("files", order_by=id, uselist=True), uselist=False)
-
   def __init__(self, file_id, purpose):
     self.id = file_id
     self.purpose_name = purpose
@@ -224,3 +166,65 @@ class File(Base):
     if not extension: extension = ''
     # create the path
     return str(os.path.join(directory, "%06d%s" % (self.id, extension)))
+
+
+# dictionary storing the loaded protocol information
+protocol_file = pkg_resources.resource_filename("bob.db.celeba", "data/protocol.tar.bz2")
+files_list = []
+annotations_dict = {}
+attributes_dict = {}
+purpose_names = ("training", "validation", "test")
+
+def _file_id(name):
+  return int(os.path.splitext(name)[0])
+
+def get_files():
+  """Reads the 'list_eval_partition.txt' from the protocol file"""
+  if not files_list:
+    tar = tarfile.open(protocol_file, 'r')
+    f = tar.extractfile('list_eval_partition.txt')
+    # read the lines
+    for line in f:
+      splits = line.rstrip().split()
+      assert len(splits) == 2, splits
+
+      # create file
+      file = File(_file_id(splits[0]), purpose_names[int(splits[1])])
+      files_list.append(file)
+  return files_list
+
+def get_annotations():
+  """Reads the 'list_landmarks_celeba.txt' from the protocol file"""
+  if not annotations_dict:
+    tar = tarfile.open(protocol_file, 'r')
+    f = tar.extractfile('list_landmarks_celeba.txt')
+    # ignore the first two lines
+    _ = f.readline()
+    _ = f.readline()
+    # read the rest of the lines
+    for line in f:
+      splits = line.rstrip().split()
+      assert len(splits) == 11, splits
+
+      # create annotation
+      annotation = Annotation(_file_id(splits[0]), [int(s) for s in splits[1:]])
+      annotations_dict[annotation.file_id] = annotation
+  return annotations_dict
+
+def get_attributes():
+  """Reads the 'list_attr_celeba.txt' from the protocol file"""
+  if not attributes_dict:
+    tar = tarfile.open(protocol_file, 'r')
+    f = tar.extractfile('list_attr_celeba.txt')
+    # ignore the first two lines
+    _ = f.readline()
+    _ = f.readline()
+    # read the rest of the lines
+    for line in f:
+      splits = line.rstrip().split()
+      assert len(splits) == 41, splits
+
+      # create attributes
+      attributes = Attributes(_file_id(splits[0]), [int(s) for s in splits[1:]])
+      attributes_dict[attributes.file_id] = attributes
+  return attributes_dict
