@@ -35,16 +35,16 @@ class Annotation:
     self.file_id = file_id
 
     assert len(labels) == 10
-    self.re_x = labels[2] # left eye in the list file
-    self.re_y = labels[3]
-    self.le_x = labels[0] # right eye in the list file
-    self.le_y = labels[1]
+    self.re_x = labels[0] # left eye in the list file
+    self.re_y = labels[1]
+    self.le_x = labels[2] # right eye in the list file
+    self.le_y = labels[3]
     self.n_x = labels[4]
     self.n_y = labels[5]
-    self.rm_x = labels[8] # left mouth in the list file
-    self.rm_y = labels[9]
-    self.lm_x = labels[6] # right mouth in the list file
-    self.lm_y = labels[7]
+    self.rm_x = labels[6] # left mouth in the list file
+    self.rm_y = labels[7]
+    self.lm_x = labels[8] # right mouth in the list file
+    self.lm_y = labels[9]
 
   def __call__(self):
     """Returns these annotations in a dictionary, which are: ``{'reye' : (re_y, re_x), 'leye' : (le_y, le_x), 'nose' : (n_y, n_x), 'rmouht' : (rm_y, rm_x), 'lmouth' : (lm_y, lm_x)}``.
