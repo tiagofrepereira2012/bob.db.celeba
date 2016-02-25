@@ -57,3 +57,27 @@ For example, if you only want the attractive young women, you might want to call
 .. doctest::
 
    >>> attractive_young_women = db.objects(with_attributes=["Attractive", "Young"], without_attributes="Male")
+
+
+Note that the dataset is highly biased, meaning that for most of the attributes, there is a strong bias on either having that attribute or not -- for most attributes the bias is on the negative side.
+You can get the bias of the dataset (here, only the training set) as follows:
+
+.. doctest::
+
+   >>> training_set = db.training_set()
+   >>> training_attributes = [db.attributes(f) for f in training_set]
+   >>> attribute_names = db.attribute_names()
+   >>> counts = [sum(a[i] == 1 for a in training_attributes) for i in range(len(attribute_names))]
+   >>> for n,c in zip(attribute_names, counts):
+   ...   print ("%6d of %d positives (%3.2f%%) for attribute %s" % (c, len(training_set), float(c) / float(len(training_set)), n))
+    18177 of 162770 positives (0.11%) for attribute 5_o_Clock_Shadow
+    43278 of 162770 positives (0.27%) for attribute Arched_Eyebrows
+    83603 of 162770 positives (0.51%) for attribute Attractive
+    33280 of 162770 positives (0.20%) for attribute Bags_Under_Eyes
+     3713 of 162770 positives (0.02%) for attribute Bald
+   ...
+    68263 of 162770 positives (0.42%) for attribute Male
+   ...
+   126788 of 162770 positives (0.78%) for attribute Young
+
+Try these commands out to get the full list of all 40 attributes.
