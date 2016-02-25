@@ -30,6 +30,8 @@ class Database():
     self.original_directory = original_directory
     self.original_extension = original_extension
 
+    self._purpose_dict = {'training':'training', 'world':'training', 'validation':'validation', 'dev':'validation', 'test':'test', 'eval':'test'}
+
   def _check_parameters_for_validity(self, parameters, parameter_description, valid_parameters, default_parameters = None):
     """Checks the given parameters for validity, i.e., if they are contained in the set of valid parameters.
     It also assures that the parameters form a tuple or a list.
@@ -70,6 +72,10 @@ class Database():
     # check passed, now return the list/tuple of parameters
     return parameters
 
+  def _update_purposes(self, purposes):
+    """Renames the purposes so that all of them are from ``("training", "validation", "test")``"""
+    return list(set(self._purpose_dict[p] if p in self._purpose_dict else p for p in purposes))
+
 
   def attribute_names(self):
     """Returns the vector of labels
@@ -77,8 +83,8 @@ class Database():
     return Attributes.attribute_names
 
 
-  def objects(self, purposes = None):
-    """objects(self, purposes=None) -> files
+  def objects(self, purposes = None, with_attributes = None, without_attributes = None):
+    """objects(self, purposes=None, with_attributes=None, without_attributes=None) -> files
 
     Returns a list of :py:class:`File` objects for the given purposes.
 
@@ -86,17 +92,76 @@ class Database():
 
     ``purposes`` : str or [str] or ``None``
 
-      A purpose or a list of purposes, which might be ``("training", "validation", "test")``.
+      A purpose or a list of purposes, which might be ``("training", "validation", "test")``, or ``("world", "dev", "eval")``.
       If ``None``, the full list of purposes will be used.
+
+    ``with_attributes`` : str or [str] or ``None``
+      If given, the resulting list is filtered to contain only objects with the given list of attributes.
+      If several attributes are specified, the are combined with a logical ``and``.
+
+    ``without_attributes`` : str or [str] or ``None``
+      If given, the resulting list is filtered to contain only objects that do not possess the given list of attributes.
+      If several attributes are specified, the are combined with a logical ``and``.
 
     **Returns:**
 
     ``files`` : [:py:class:`File`]
-      A list of files for the given purpose(s).
+      A list of files for the given purpose(s), where the given attributes are filtered.
     """
-    purposes = self._check_parameters_for_validity(purposes, "purpose", purpose_names)
+    purposes = self._check_parameters_for_validity(purposes, "purpose", ("training", "world", "validation", "dev", "test", "eval"))
+    purposes = self._update_purposes(purposes)
 
-    return [f for f in get_files() if f.purpose_name in purposes]
+    if with_attributes is not None:
+      with_attributes = self._check_parameters_for_validity(with_attributes, "with attribute", self.attribute_names())
+    if without_attributes is not None:
+      without_attributes = self._check_parameters_for_validity(without_attributes, "without attribute", self.attribute_names())
+
+    files = [f for f in get_files() if f.purpose_name in purposes]
+
+    if with_attributes is not None:
+      files = [f for f in files if all(a == 1 for a in self.attributes(f, with_attributes))]
+
+    if without_attributes is not None:
+      files = [f for f in files if all(a == -1 for a in self.attributes(f, without_attributes))]
+
+    return sorted(files, key = lambda x: x.id)
+
+
+  def training_set(self):
+    """training_set(self) -> files
+
+    Returns a list of :py:class:`File` objects that can be used for training
+
+    **Returns:**
+
+    ``files`` : [:py:class:`File`]
+      A list of training files.
+    """
+    return self.objects(purposes = "training")
+
+  def validation_set(self):
+    """validation_set(self) -> files
+
+    Returns a list of :py:class:`File` objects that can be used for validation purposes
+
+    **Returns:**
+
+    ``files`` : [:py:class:`File`]
+      A list of validation files.
+    """
+    return self.objects(purposes = "validation")
+
+  def test_set(self):
+    """test_set(self) -> files
+
+    Returns a list of :py:class:`File` objects that can be used for testing
+
+    **Returns:**
+
+    ``files`` : [:py:class:`File`]
+      A list of test files.
+    """
+    return self.objects(purposes = "test")
 
 
   def original_file_name(self, file):

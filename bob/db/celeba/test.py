@@ -27,11 +27,23 @@ def test_query():
 
   train = db.objects("training")
   assert len(train) == 162770
+  train = db.objects("world")
+  assert len(train) == 162770
+  train = db.training_set()
+  assert len(train) == 162770
 
   valid = db.objects("validation")
   assert len(valid) == 19867
+  valid = db.objects("dev")
+  assert len(valid) == 19867
+  valid = db.validation_set()
+  assert len(valid) == 19867
 
   test = db.objects("test")
+  assert len(test) == 19962
+  test = db.objects("eval")
+  assert len(test) == 19962
+  test = db.test_set()
   assert len(test) == 19962
 
   all = db.objects()
@@ -68,6 +80,15 @@ def test_attribute_values():
   assert f.id == 1
   first_attributes = [-1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1]
   assert db.attributes(f) == first_attributes
+
+
+def test_attribute_query():
+  db = bob.db.celeba.Database()
+  files = db.objects("training", with_attributes=["Sideburns", "Attractive"], without_attributes=["Young"])
+  assert len(files) == 357
+
+  files = db.objects("training", with_attributes=["Young"], without_attributes=["Young"])
+  assert len(files) == 0
 
 
 def test_file_names():
